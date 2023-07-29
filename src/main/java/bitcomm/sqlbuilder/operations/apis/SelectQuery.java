@@ -4,9 +4,9 @@ public interface SelectQuery extends InExpression,WhereExpression,JoinExpression
 {
   
     
-    SelectQuery limit(int limit);
+    SelectQuery limit(Integer limit);
     
-    SelectQuery offset(int offset);
+    SelectQuery offset(Integer offset);
     
     SelectQuery select(String... columns);
     

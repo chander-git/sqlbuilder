@@ -199,13 +199,14 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 
     @Override
-    public SelectQuery limit(int limit) {
+    public SelectQuery limit(Integer limit) {
 	this.LIMIT=limit;
 	return this;
     }
 
     @Override
-    public SelectQuery offset(int offset) {
+    public SelectQuery offset(Integer offset) {
+	OFFSET=offset;
 	return this;
     }
 
