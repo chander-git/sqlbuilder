@@ -138,7 +138,6 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     @Override
     public Optional<String> build() {
 
-	searchField= String.join(",", searchFieldList);
 
 	joinsString=join.build().orElse(EMPTY);
 
@@ -217,9 +216,18 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	{
 	    searchFieldList.add(field);
 	}
+	searchField=String.join(",", searchFieldList);
 	return this;
     }
+    public SelectQuery selectDistinct(String... columns) {
 
+	for (String field : columns)
+	{
+	    searchFieldList.add(field);
+	}
+	searchField="DISTINCT " +String.join(",", searchFieldList);
+	return this;
+    }
     @Override
     public SelectQuery orderBy(String column) {
 
@@ -368,7 +376,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     }
 
     @Override
-    public SelectQuery in(List list) {
+    public SelectQuery in(Object list) {
 	return where.in(list);
     }
 

@@ -1,10 +1,8 @@
 
 package bitcomm;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,23 +36,30 @@ public class App
 	.innerJoin("customer c")
 	.on("d.customer_id", "c.customerid")
 	.where("d.deviceId").equalTo(deviceId)
-	.and()
+	
 	.where("d.name")
 	.like("NOQ")
 //	.or()
 //	.where("c.stncode").equalTo("MSV")
-	.and()
+	
 	.where("d.updated_ts")
 	.between(null, null)
-	.and()
+	.limit(10)
+	
 	.where("d.name").like(null)
-	.and()
+	
 	.where("d.additionaldetail #>> '{remarks}'")
 	.equalTo("None")
-	.and().where("d.name")
-	.ilike("APDJ".toLowerCase())
-	.orderByDesc("d.updated_ts")
 	.groupBy("d.updated_ts")
+	.where("d.name")
+	.ilike("APDJ".toLowerCase())
+	.or()
+	.where("  d.deviceid").equalTo(
+		new PsqlSelectQuery().selectDistinct("d2.deviceid")
+		.from("device d2").where("d2.deviceid").equalTo("a1430aa7-9830-4a2d-a556-88ab54d64571")
+		)
+	
+	.orderByDesc("d.updated_ts")
 	.groupBy("d.name");
 
 

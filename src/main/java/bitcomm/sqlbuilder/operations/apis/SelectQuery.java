@@ -20,5 +20,7 @@ public interface SelectQuery extends InExpression,WhereExpression,JoinExpression
     
     SelectQuery selectAll();
     
+    SelectQuery selectDistinct(String ...column);
+    
     String countQuery();
 }
