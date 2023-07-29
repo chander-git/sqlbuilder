@@ -1,4 +1,4 @@
-package bitcomm.sqlbuilder.psql;
+package bitcomm.sqlbuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -181,16 +181,18 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     private String countQuery(String countOf) 
     {
 	return
-
+		 "SELECT "+countOf+" FROM ( "+
+		
 		String.format(getCountSqlFormat(), 
 
-			countOf , _tablename , joinsString ,
+			searchField , _tablename , joinsString ,
 
 			whereString 
 
-			);
-
+			)
+		+")countQuery ";
     }
+    
     @Override
     public String toString() {
 	return build().orElse("");
