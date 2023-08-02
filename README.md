@@ -31,4 +31,4 @@ Here's an overview of the main components of the code:
    - `getResultSqlFormat()`: Returns the SQL query format string.
    - `countQuery(String countOf)`: Constructs a SQL count query based on the provided count function.
 
-This abstract class seems to be a part of a larger SQL query builder framework that aims to provide a simplified and structured way to create SQL select queries in Java applications. Concrete subclasses are expected to provide specific implementations for the abstract methods and potentially extend the functionality to support other SQL query types (e.g., INSERT, UPDATE, DELETE).
+This abstract class is a part of a larger SQL query builder framework that aims to provide a simplified and structured way to create SQL select queries in Java applications. Concrete subclasses are expected to provide specific implementations for the abstract methods and potentially extend the functionality to support other SQL query types (e.g., INSERT, UPDATE, DELETE).

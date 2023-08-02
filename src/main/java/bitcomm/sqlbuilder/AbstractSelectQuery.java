@@ -239,7 +239,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     @Override
     public SelectQuery orderBy(String column) {
 
-	String orderBy = (" ORDER BY "+column+" ASC " );
+	String orderBy = (" "+column+" ASC " );
 	orderByList.add(orderBy);
 	return this;
     }
@@ -370,6 +370,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 	return this;
     }
+    
     public SelectQuery between(Object start , Object end){
 	where.between(start, end);
 	return this;
