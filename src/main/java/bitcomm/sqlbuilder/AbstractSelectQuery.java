@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import bitcomm.sqlbuilder.operations.InvalidSqlException;
 import bitcomm.sqlbuilder.operations.Join;
 import bitcomm.sqlbuilder.operations.Where;
 import bitcomm.sqlbuilder.operations.apis.DataType;
@@ -27,7 +28,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     protected String joinTableName = "";
     protected JoinType joinType = new JoinType();
     protected Integer LIMIT = null;
-    protected Integer OFFSET = null;
+    protected Long OFFSET = null;
 
     private static final String COLUMNS = "%s";
     private static final String TABLE_NAME = "%s";
@@ -74,7 +75,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     private String searchField = EMPTY;
 
-   
+
 
     public AbstractSelectQuery() {
 	this(null);
@@ -134,7 +135,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	setWhereRightOperand(rightColumn);
 	return where;
     }
-    
+
     @Override
     public Optional<String> build() {
 
@@ -180,8 +181,8 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     private String countQuery(String countOf) 
     {
 	return
-		 "SELECT "+countOf+" FROM ( "+
-		
+		"SELECT "+countOf+" FROM ( "+
+
 		String.format(getCountSqlFormat(), 
 
 			searchField , _tablename , joinsString ,
@@ -191,10 +192,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 			)
 		+")countQuery ";
     }
-    
+
     @Override
-    public String toString() {
-	return build().orElse("");
+    public String toString() 
+    {
+	Optional<String> isBuild = build();
+	return isBuild.orElse("");
     }
 
 
@@ -205,7 +208,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     }
 
     @Override
-    public SelectQuery offset(Integer offset) {
+    public SelectQuery offset(Long offset) {
 	OFFSET=offset;
 	return this;
     }
@@ -380,6 +383,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     public SelectQuery in(Object list) {
 	return where.in(list);
     }
-
-
+    
+    @Override
+    public SelectQuery setPageRange(Integer pageSize, Integer page) throws InvalidSqlException {
+	this.LIMIT=pageSize;
+	this.OFFSET=getOffset(pageSize, page);
+	return this;
+    }
+    
 }

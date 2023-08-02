@@ -1,12 +1,7 @@
 package bitcomm.sqlbuilder.operations.apis;
 
-public interface SelectQuery extends InExpression,WhereExpression,JoinExpression
+public interface SelectQuery extends InExpression,WhereExpression,JoinExpression, PageRangeExpression
 {
-  
-    
-    SelectQuery limit(Integer limit);
-    
-    SelectQuery offset(Integer offset);
     
     SelectQuery select(String... columns);
     
@@ -23,4 +18,6 @@ public interface SelectQuery extends InExpression,WhereExpression,JoinExpression
     SelectQuery selectDistinct(String ...column);
     
     String countQuery();
+
+    
 }
