@@ -18,10 +18,7 @@ public class App
     public static void main(String[] args) 
     {
 	log.info("Sql Builder App runuing..");
-	//	List<UUID> l = Arrays.asList(UUID.fromString("a1430aa7-9830-4a2d-a556-88ab54d64571"),UUID.fromString("a1430aa7-9830-4a2d-a556-88ab54d64571"));
-	//	
-	// String s = ListToCommaArray(l);
-	//	
+	
 	historyFilter(UUID.fromString("a1430aa7-9830-4a2d-a556-88ab54d64571"), 1690548894000L, null, null, version, null, null);
     }
     public static void  historyFilter(UUID deviceId, Long startTS, Long endTs, List<String> keys,
@@ -63,7 +60,7 @@ public class App
 	    
 	    .orderByDesc("d.updated_ts")
 	    .groupBy("d.name")
-	    .setPageRange(40, -1);
+	    .setPageRange(40, 0);
 	} catch (InvalidSqlException e) {
 	    e.printStackTrace();
 	}

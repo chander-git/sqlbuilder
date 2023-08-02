@@ -44,16 +44,16 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	    + WHERE_CONDIONS + " " + HAVING_CONDIONS + " " + ORDER_BY_CONDIONS + " " + GROUP_BY_CONDIONS + " "
 	    + LIMIT_CONDTION + " " + OFFSET_CONDITION + " ";
 
-    private final static String sqlCountQueryFormat = SELECT + COLUMNS + " FROM " + TABLE_NAME + " " + JOINS + " "
-	    + WHERE_CONDIONS + " ";
+    //    private final static String sqlCountQueryFormat = SELECT + COLUMNS + " FROM " + TABLE_NAME + " " + JOINS + " "
+    //	    + WHERE_CONDIONS + " ";
 
     public String getResultSqlFormat() {
 	return sqlStringQueryFormat;
     }
 
-    public String getCountSqlFormat() {
-	return sqlCountQueryFormat;
-    }
+    //    public String getCountSqlFormat() {
+    //	return sqlCountQueryFormat;
+    //    }
 
     //////////////////////////////////////////////////////////
     private  WhereExpression where;
@@ -178,18 +178,22 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     }
 
-    private String countQuery(String countOf) 
+    public String countQuery(String countOf) 
     {
 	return
-		"SELECT "+countOf+" FROM ( "+
+		SELECT +countOf+" FROM ( "+
 
-		String.format(getCountSqlFormat(), 
+	String.format(
 
-			searchField , _tablename , joinsString ,
+		getResultSqlFormat(),
 
-			whereString 
+		searchField, _tablename, joinsString,
 
-			)
+		whereString, groupByString,  havingString,
+
+		orderByString ,EMPTY,EMPTY
+
+		)
 		+")countQuery ";
     }
 
@@ -251,21 +255,13 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     @Override
     public SelectQuery groupBy(String... columns) {
 
-	if (columns!=null)
+	if (columns != null) 
 	{
-
-	    //	    searchFieldList.clear();
-
 	    for (String column : columns) {
 
 		groupBy.add(column);
 
 	    }
-	    //	    groupBy.forEach(t->{
-	    //		searchFieldList.add(t);
-	    //
-	    //	    });
-
 	}
 	return this;
     }
@@ -383,12 +379,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     public SelectQuery in(Object list) {
 	return where.in(list);
     }
-    
+
     @Override
     public SelectQuery setPageRange(Integer pageSize, Integer page) throws InvalidSqlException {
 	this.LIMIT=pageSize;
 	this.OFFSET=getOffset(pageSize, page);
 	return this;
     }
-    
+
 }
