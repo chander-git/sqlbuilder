@@ -1,45 +1,34 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+Here's an overview of the main components of the code:
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+1. `AbstractSelectQuery` class: This is an abstract class that implements the `SelectQuery` interface, providing common functionality for building SQL select queries.
 
----
+2. Fields:
+   - `_tablename`: The name of the table from which to select data.
+   - `orderByList`: A list of columns to order the result set.
+   - `searchFieldList`: A list of columns to be selected in the query.
+   - `groupBy`: A list of columns for grouping the results.
+   - `HAVING`: The HAVING clause condition for aggregating functions.
+   - `joinTableName`: The name of the table to join in the query.
+   - `joinType`: An object representing the type of join (INNER, LEFT, RIGHT).
+   - `LIMIT`: The limit on the number of rows to be returned in the query.
+   - `OFFSET`: The offset for pagination.
 
-## Edit a file
+3. Constants:
+   - `EMPTY`: An empty string constant.
+   - `SELECT`: The SELECT keyword for SQL queries.
+   - Various string format constants for building the final SQL query.
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+4. Components:
+   - `WhereExpression`: A component for building the WHERE clause of the SQL query.
+   - `JoinExpression`: A component for building the JOIN clause of the SQL query.
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+5. Methods:
+   - Various methods for constructing the SQL query, including those for the WHERE clause, JOIN clause, GROUP BY, ORDER BY, and pagination.
+   - `build()`: A method that constructs the final SQL query based on the provided parameters.
 
----
+6. Other methods:
+   - `getResultSqlFormat()`: Returns the SQL query format string.
+   - `countQuery(String countOf)`: Constructs a SQL count query based on the provided count function.
 
-## Create a file
-
-Next, you’ll add a new file to this repository.
-
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
-
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
-
----
-
-## Clone a repository
-
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
-
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
-
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+This abstract class seems to be a part of a larger SQL query builder framework that aims to provide a simplified and structured way to create SQL select queries in Java applications. Concrete subclasses are expected to provide specific implementations for the abstract methods and potentially extend the functionality to support other SQL query types (e.g., INSERT, UPDATE, DELETE).
