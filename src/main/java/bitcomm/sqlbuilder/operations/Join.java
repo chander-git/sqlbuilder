@@ -1,10 +1,11 @@
 package bitcomm.sqlbuilder.operations;
 
-import static bitcomm.sqlbuilder.operations.apis.JoinType.*;
+import static bitcomm.sqlbuilder.operations.apis.JoinType.INNER;
+import static bitcomm.sqlbuilder.operations.apis.JoinType.LEFT;
+import static bitcomm.sqlbuilder.operations.apis.JoinType.RIGHT;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import bitcomm.sqlbuilder.operations.apis.JoinExpression;
 import bitcomm.sqlbuilder.operations.apis.JoinType;

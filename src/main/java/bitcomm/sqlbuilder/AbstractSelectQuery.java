@@ -1,8 +1,10 @@
 package bitcomm.sqlbuilder;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 
 import bitcomm.sqlbuilder.operations.InvalidSqlException;
 import bitcomm.sqlbuilder.operations.Join;
@@ -16,6 +18,7 @@ import bitcomm.sqlbuilder.operations.apis.WhereExpression;
 
 public abstract class AbstractSelectQuery  implements SelectQuery 
 {
+
     protected static final String EMPTY = "";
 
     protected static final String SELECT = " SELECT ";
@@ -24,9 +27,9 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     protected List<String> orderByList = new ArrayList<>();
     protected List<String> searchFieldList=new ArrayList<>();
     protected List<String> groupBy = new ArrayList<>();
-    protected String HAVING = "";
-    protected String joinTableName = "";
-    protected JoinType joinType = new JoinType();
+    protected String HAVING = EMPTY;
+    protected String joinTableName = EMPTY;
+    protected JoinType joinType =  new JoinType();
     protected Integer LIMIT = null;
     protected Long OFFSET = null;
 
@@ -38,7 +41,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     private static final String ORDER_BY_CONDIONS = "%s";
     private static final String LIMIT_CONDTION = "%s";
     private static final String OFFSET_CONDITION = "%s";
-    private static final String JOINS = "%s";
+    private static final String JOINS =  "%s";
 
     private final static String sqlStringQueryFormat = SELECT + COLUMNS + " FROM " + TABLE_NAME + " " + JOINS + " "
 	    + WHERE_CONDIONS + " " + HAVING_CONDIONS + " " + ORDER_BY_CONDIONS + " " + GROUP_BY_CONDIONS + " "
@@ -57,6 +60,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     //////////////////////////////////////////////////////////
     private  WhereExpression where;
+    
     private JoinExpression join;
 
     private String joinsString = EMPTY;
@@ -75,8 +79,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     private String searchField = EMPTY;
 
-
-
+    
     public AbstractSelectQuery() {
 	this(null);
     }
@@ -96,7 +99,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     }
 
     @Override
-    public WhereExpression and() {
+    public  WhereExpression and() {
 	where.and();
 	return where;
     }
@@ -149,16 +152,16 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	    groupByString = "GROUP BY " + j;
 	}
 
-	havingString = HAVING == null ? "" : HAVING;
+	havingString = HAVING == null ? EMPTY : HAVING;
 
 	String o = String.join(",", orderByList);
 	if (o != null && !o.isEmpty()) {
 	    orderByString = "ORDER BY " + o;
 	}
 
-	limitString=LIMIT==null?"":("LIMIT "+LIMIT);
+	limitString=LIMIT==null?EMPTY:("LIMIT "+LIMIT);
 
-	offsetString=OFFSET==null?"":("OFFSET "+OFFSET);
+	offsetString=OFFSET==null?EMPTY:("OFFSET "+OFFSET);
 
 
 	return	Optional.of(
@@ -201,7 +204,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     public String toString() 
     {
 	Optional<String> isBuild = build();
-	return isBuild.orElse("");
+	return isBuild.orElse(EMPTY);
     }
 
 
@@ -219,12 +222,14 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     @Override
     public SelectQuery select(String... columns) {
-
+	searchField=EMPTY;
+	searchFieldList.clear();
 	for (String field : columns)
 	{
 	    searchFieldList.add(field);
 	}
 	searchField=String.join(",", searchFieldList);
+	
 	return this;
     }
     public SelectQuery selectDistinct(String... columns) {
@@ -312,7 +317,6 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     }
 
 
-
     @Override
     public String countQuery() 
     {
@@ -370,7 +374,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 	return this;
     }
-    
+
     public SelectQuery between(Object start , Object end){
 	where.between(start, end);
 	return this;

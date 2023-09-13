@@ -1,5 +1,6 @@
 package bitcomm.sqlbuilder.operations;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,9 +19,10 @@ public class Where  implements WhereExpression {
 
     private String rightOperand;
     private DataType rightOperandDataType=null;
-    private final static String AND="AND".trim();
-    private final static String OR="OR".trim();
-
+    private final static String AND="AND";
+    private final static String OR="OR";
+    
+    
     public Where(SelectQuery selectQuery ) {
 	this.selectQuery=selectQuery;
     }
@@ -43,6 +45,7 @@ public class Where  implements WhereExpression {
     public WhereExpression where(String column, String operator, Object value ) 
     {
 	try {
+	    
 	    if (value==null) 
 	    {
 		removeLastWhereOperator();
@@ -60,6 +63,10 @@ public class Where  implements WhereExpression {
 		    else if (value instanceof String) {
 
 			queryList.add(" "+column+" "+operator+" '"+value+"' ");
+		    }
+		    else if (value instanceof Boolean) {
+
+			queryList.add(" "+column+" "+operator+" "+value+" ");
 		    }
 		    else if (value instanceof SelectQuery) 
 		    {
@@ -82,7 +89,7 @@ public class Where  implements WhereExpression {
     private void removeLastWhereOperator() {
 	try {
 	    String lastkeyWord = queryList.getLast();
-	    
+
 	    if (lastkeyWord != null && (lastkeyWord.equals(AND)||
 		    lastkeyWord.equals(OR)))
 	    {
@@ -126,9 +133,9 @@ public class Where  implements WhereExpression {
 
     @Override
     public Optional<String> build() {
-	
+
 	StringBuilder stringBuilder=new StringBuilder("");
-	
+
 	if (queryList.isEmpty()==false)
 	{
 	    stringBuilder.append(" WHERE ");
@@ -200,7 +207,7 @@ public class Where  implements WhereExpression {
     }
 
     public SelectQuery equalTo(Object object){
-	selectQuery.where(rightOperand, "=", object);
+	where(rightOperand, "=", object);
 
 	return selectQuery;
     }
@@ -216,11 +223,14 @@ public class Where  implements WhereExpression {
     @Override
     public SelectQuery in(Object object) {
 	if (object==null) 
-	   where(rightOperand, null, null);
+	    where(rightOperand, null, null);
 
 	else if(object instanceof List)
-	  where(rightOperand,null," IN ("+listToCommaArray((List)object)+")" );
-
+	    where(rightOperand,null," IN ("+listToCommaArray((List)object)+")" );
+	
+	else if(object instanceof String[])
+	    where(rightOperand,null," IN ("+listToCommaArray(Arrays.asList(object))+")" );
+	
 	else if(object instanceof SelectQuery) {
 	    SelectQuery  selectQ=(SelectQuery) object;
 	    where(rightOperand,null," IN ("+selectQ.toString()+")" );
@@ -241,11 +251,10 @@ public class Where  implements WhereExpression {
 
     @Override
     public SelectQuery ilike(Object object) {
-	selectQuery.where(rightOperand, null, object==null
+	where(rightOperand, null, object==null
 		?null:"ILIKE '%" +object+"%'");
 
 	return selectQuery;
     }
-
 
 }
