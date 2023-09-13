@@ -56,17 +56,13 @@ public class Where  implements WhereExpression {
 
 		if (operator!=null)
 		{
-		    if (value instanceof Number) {
+		    if (value instanceof Number|| value instanceof Boolean) {
 
 			queryList.add(" "+column+" "+operator+" "+value);
 		    }
 		    else if (value instanceof String) {
 
 			queryList.add(" "+column+" "+operator+" '"+value+"' ");
-		    }
-		    else if (value instanceof Boolean) {
-
-			queryList.add(" "+column+" "+operator+" "+value+" ");
 		    }
 		    else if (value instanceof SelectQuery) 
 		    {

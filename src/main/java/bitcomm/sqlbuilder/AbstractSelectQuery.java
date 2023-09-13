@@ -1,10 +1,8 @@
 package bitcomm.sqlbuilder;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
-import java.util.TreeSet;
+import java.util.Set;
 
 import bitcomm.sqlbuilder.operations.InvalidSqlException;
 import bitcomm.sqlbuilder.operations.Join;
@@ -23,10 +21,10 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     protected static final String SELECT = " SELECT ";
 
-    protected String _tablename;
-    protected List<String> orderByList = new ArrayList<>();
-    protected List<String> searchFieldList=new ArrayList<>();
-    protected List<String> groupBy = new ArrayList<>();
+    protected Set<String> _tablename=new HashSet<>();
+    protected Set<String>  orderByList = new HashSet<>();
+    protected Set<String>  searchFieldList=new HashSet<>();
+    protected Set<String> groupBy = new HashSet<>();
     protected String HAVING = EMPTY;
     protected String joinTableName = EMPTY;
     protected JoinType joinType =  new JoinType();
@@ -79,17 +77,11 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     private String searchField = EMPTY;
 
+    private String tableNameString = EMPTY;
     
     public AbstractSelectQuery() {
-	this(null);
-    }
-
-    private AbstractSelectQuery(String tableName) 
-    {
-	this._tablename = tableName;
 	this.where = new Where(this);
 	this.join = new Join(this);
-	this.groupBy = new ArrayList<String>();
     }
 
     @Override
@@ -163,14 +155,15 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 	offsetString=OFFSET==null?EMPTY:("OFFSET "+OFFSET);
 
-
+	tableNameString = String.join(",", _tablename);
+	
 	return	Optional.of(
 
 		String.format(
 
 			getResultSqlFormat(),
 
-			searchField, _tablename, joinsString,
+			searchField,tableNameString , joinsString,
 
 			whereString, groupByString,  havingString,
 
@@ -190,7 +183,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 		getResultSqlFormat(),
 
-		searchField, _tablename, joinsString,
+		searchField, String.join(",", _tablename), joinsString,
 
 		whereString, groupByString,  havingString,
 
@@ -204,7 +197,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     public String toString() 
     {
 	Optional<String> isBuild = build();
-	return isBuild.orElse(EMPTY);
+	return isBuild.orElse("SELECT");
     }
 
 
@@ -274,7 +267,16 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     @Override
     public SelectQuery from(String tableName)
     {
-	this._tablename=tableName;
+	this._tablename.add(tableName);
+	return this;
+    }
+    
+    @Override
+    public SelectQuery from(String[] tableNames )
+    {
+	for (String table : tableNames) {
+	    this._tablename.add(table);
+	}
 	return this;
     }
 

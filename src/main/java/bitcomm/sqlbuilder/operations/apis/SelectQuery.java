@@ -19,5 +19,7 @@ public interface SelectQuery extends InExpression,WhereExpression,JoinExpression
     
     String countQuery();
 
+    SelectQuery from(String[] tableName);
+
     
 }
