@@ -48,7 +48,7 @@ public class Where  implements WhereExpression {
     {
 	try {
 	    
-	    if (value==null|| (value instanceof Collection && ((Collection) value).isEmpty() )) 
+	    if (value==null) 
 	    {
 		removeLastWhereOperator();
 	    }
@@ -228,7 +228,7 @@ public class Where  implements WhereExpression {
 
     @Override
     public SelectQuery in(Object object) {
-	if (object==null) 
+	if (object==null||(object instanceof Collection<?> && ((Collection) object).isEmpty())) 
 	    where(rightOperand, null, null);
 
 	else if(object instanceof List)
