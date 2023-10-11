@@ -19,5 +19,6 @@ public interface OperatorExpression extends InExpression
     public SelectQuery equalTo(Object object);
     
     public SelectQuery between(Object start , Object end);
+
     
 }

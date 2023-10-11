@@ -31,7 +31,6 @@ public class App
     {
 	log.info("Sql Builder App runuing..");
 
-	func(null);
 	
 //	historyFilter(UUID.fromString("a1430aa7-9830-4a2d-a556-88ab54d64571"), 1690548894000L, null, null, version, null, null);
     }

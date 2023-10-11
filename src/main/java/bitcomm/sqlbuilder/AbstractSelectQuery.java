@@ -78,6 +78,11 @@ public abstract class AbstractSelectQuery  implements SelectQuery
     private String searchField = EMPTY;
 
     private String tableNameString = EMPTY;
+
+    private String unionString = EMPTY ;
+
+    private boolean isBuildSuccess=false;
+
     
     public AbstractSelectQuery() {
 	this.where = new Where(this);
@@ -157,25 +162,34 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 	tableNameString = String.join(",", _tablename);
 	
-	return	Optional.of(
+	String sqlQuery = String.format(
 
-		String.format(
+		getResultSqlFormat(),
 
-			getResultSqlFormat(),
+		searchField,tableNameString , joinsString,
 
-			searchField,tableNameString , joinsString,
+		whereString, groupByString,  havingString,
 
-			whereString, groupByString,  havingString,
+		orderByString, limitString,  offsetString
 
-			orderByString, limitString,  offsetString
+		)+unionString;
+	
+	Optional<String> buildEntity = Optional.of(sqlQuery);
 
-			)
-		);
-
+	isBuildSuccess=true;
+	return buildEntity;
     }
 
-    public String countQuery(String countOf) 
+    public synchronized String countQuery(String countOf) 
     {
+//	if (!isBuildSuccess) 
+//	{
+//	    build();
+//	}
+	String j = String.join(",", groupBy);
+	if (j != null && !j.isEmpty()) {
+	    groupByString = "GROUP BY " + j;
+	}
 	return
 		SELECT +countOf+" FROM ( "+
 
@@ -183,7 +197,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 		getResultSqlFormat(),
 
-		searchField, String.join(",", _tablename), joinsString,
+		searchField,tableNameString, joinsString,
 
 		whereString, groupByString,  havingString,
 
@@ -234,6 +248,14 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	searchField="DISTINCT " +String.join(",", searchFieldList);
 	return this;
     }
+    
+    @Override
+    public SelectQuery from(SelectQuery selectQuery , String alias) {
+	
+	_tablename.add("("+selectQuery.toString()+") "+alias);
+	return this;
+    }
+    
     @Override
     public SelectQuery orderBy(String column) {
 
@@ -392,6 +414,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	this.LIMIT=pageSize;
 	this.OFFSET=getOffset(pageSize, page);
 	return this;
+    }
+    
+    @Override
+    public SelectQuery union(SelectQuery query) {
+	unionString=" "+query.toString();
+        return null;
     }
 
 }

@@ -9,17 +9,21 @@ public interface SelectQuery extends InExpression,WhereExpression,JoinExpression
     
     SelectQuery orderByDesc(String column);
     
-    SelectQuery groupBy(String... column);
+    SelectQuery groupBy(String... columns);
     
     SelectQuery from(String tableName);
     
     SelectQuery selectAll();
     
-    SelectQuery selectDistinct(String ...column);
+    SelectQuery selectDistinct(String ...columns);
     
     String countQuery();
 
-    SelectQuery from(String[] tableName);
+    SelectQuery from(String[] tableNames);
+    
+    SelectQuery from(SelectQuery selectQuery, String alias);
+    
+    SelectQuery union(SelectQuery query);
 
     
 }

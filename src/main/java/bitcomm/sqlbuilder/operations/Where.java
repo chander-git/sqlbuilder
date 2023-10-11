@@ -1,10 +1,12 @@
 package bitcomm.sqlbuilder.operations;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import bitcomm.sqlbuilder.operations.apis.DataType;
@@ -27,7 +29,7 @@ public class Where  implements WhereExpression {
 	this.selectQuery=selectQuery;
     }
 
-    private void setDefaultBooleanLogic() {
+    private void appendDefaultLogicalOper() {
 	try {
 
 	    String lastkeyWord = queryList.getLast();
@@ -46,14 +48,14 @@ public class Where  implements WhereExpression {
     {
 	try {
 	    
-	    if (value==null) 
+	    if (value==null|| (value instanceof Collection && ((Collection) value).isEmpty() )) 
 	    {
 		removeLastWhereOperator();
 	    }
 	    else
 	    {
-		setDefaultBooleanLogic();
-
+		appendDefaultLogicalOper();
+		
 		if (operator!=null)
 		{
 		    if (value instanceof Number|| value instanceof Boolean) {
@@ -118,7 +120,6 @@ public class Where  implements WhereExpression {
 	return where(column,null);
     }
 
-
     @Override
     public OperatorExpression where(String column, DataType dataType) 
     {
@@ -126,6 +127,7 @@ public class Where  implements WhereExpression {
 	this.rightOperandDataType=dataType;
 	return this;
     }
+
 
     @Override
     public Optional<String> build() {
@@ -135,14 +137,15 @@ public class Where  implements WhereExpression {
 	if (queryList.isEmpty()==false)
 	{
 	    stringBuilder.append(" WHERE ");
-	    for (String string : queryList) 
+	    
+	    for (String list : queryList) 
 	    {
-		if (string.equals(OR) || string.equals(AND))
+		if (list.equals(OR) || list.equals(AND))
 		{
-		    stringBuilder.append(string);
+		    stringBuilder.append(list);
 		}
 		else {
-		    stringBuilder.append(string);
+		    stringBuilder.append(list);
 		}
 		stringBuilder.append(" ");
 	    }
@@ -184,7 +187,14 @@ public class Where  implements WhereExpression {
 	return selectQuery;
     }
 
+    @Override
+    public SelectQuery ilike(Object object) {
+	where(rightOperand, null, object==null
+		?null:"ILIKE '%" +object+"%'");
 
+	return selectQuery;
+    }
+    
     public SelectQuery lessThan(Object object){
 	where(rightOperand, "<", object);
 	return selectQuery;
@@ -245,12 +255,6 @@ public class Where  implements WhereExpression {
 	this.rightOperand=rightOperand.toString();
     }
 
-    @Override
-    public SelectQuery ilike(Object object) {
-	where(rightOperand, null, object==null
-		?null:"ILIKE '%" +object+"%'");
-
-	return selectQuery;
-    }
+   
 
 }
