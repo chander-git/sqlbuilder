@@ -118,6 +118,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	return where.whereNotNull(columns);
 
     }
+    
+    @Override
+    public OperatorExpression whereRaw(String raw) {
+        // TODO Auto-generated method stub
+        return where.whereRaw(raw);
+    }
 
     @Override
     public OperatorExpression where(String rightColumn) {

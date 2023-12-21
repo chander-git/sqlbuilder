@@ -228,22 +228,51 @@ public class Where  implements WhereExpression {
 
     @Override
     public SelectQuery in(Object object) {
-	if (object==null||(object instanceof Collection<?> && ((Collection) object).isEmpty())) 
-	    where(rightOperand, null, null);
-
-	else if(object instanceof List)
-	    where(rightOperand,null," IN ("+listToCommaArray((List)object)+")" );
 	
-	else if(object instanceof String[])
-	    where(rightOperand,null," IN ("+listToCommaArray(Arrays.asList(object))+")" );
-	
-	else if(object instanceof SelectQuery) {
-	    SelectQuery  selectQ=(SelectQuery) object;
-	    where(rightOperand,null," IN ("+selectQ.toString()+")" );
+	try {
+		boolean objNullCheck;
+		boolean objInstanceTypeCheck;
+		boolean objCollEmptCheck;
+		boolean objListTypeCheck;
+		boolean objStringArrCheck;	
+		
+		objNullCheck = object == null;
+		objInstanceTypeCheck = object instanceof Collection;
+		//objCollEmptCheck = ;
+		objListTypeCheck = (object instanceof List);
+		objStringArrCheck = (object instanceof String[]);
+		
+//		System.out.println("SelectQuery :: object               :: "+ object);
+//		
+//		System.out.println("SelectQuery :: objNullCheck         :: "+ objNullCheck);
+//		System.out.println("SelectQuery :: objInstanceTypeCheck :: "+ objInstanceTypeCheck);
+//		//System.out.println("SelectQuery :: objCollEmptCheck     :: "+ objCollEmptCheck);
+//		System.out.println("SelectQuery :: objListTypeCheck     :: "+ objListTypeCheck);
+		
+		//if (object == null || (object instanceof Collection && ((Collection) object).isEmpty())) 
+		
+		if (objNullCheck || (objInstanceTypeCheck && ((Collection) object).isEmpty())) 
+		    where(rightOperand, null, null);
 
+		else if(objListTypeCheck)
+		    where(rightOperand,null," IN ("+listToCommaArray((List)object)+")" );
+		
+		else if(objStringArrCheck)
+		    where(rightOperand,null," IN ("+listToCommaArray(Arrays.asList(object))+")" );
+		
+		else if(object instanceof SelectQuery) {
+		    SelectQuery  selectQ=(SelectQuery) object;
+		    where(rightOperand,null," IN ("+selectQ.toString()+")" );
+
+		}
+
+		return selectQuery;
+	    
 	}
-
-	return selectQuery;
+	catch (Exception e) {
+	    e.printStackTrace();
+	    return selectQuery;
+	}
     }
     private static String listToCommaArray(List list) {
 	return (String) list.stream().map(str -> String.format("'%s'", str.toString())).collect(Collectors.joining(","));
@@ -253,6 +282,12 @@ public class Where  implements WhereExpression {
     @Override
     public void setWhereRightOperand(Object rightOperand) {
 	this.rightOperand=rightOperand.toString();
+    }
+
+    @Override
+    public OperatorExpression whereRaw(String raw) {
+	 queryList.add(raw);
+	 return this;
     }
 
    

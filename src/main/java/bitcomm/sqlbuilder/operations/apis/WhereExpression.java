@@ -10,6 +10,8 @@ public interface WhereExpression extends OrExpression , AndExpression ,OperatorE
 
     OperatorExpression where(String column);
     
+    OperatorExpression whereRaw(String raw);
+    
     OperatorExpression where(String column, DataType dataType);
     
     WhereExpression whereIsNull(Object columns);
