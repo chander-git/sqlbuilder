@@ -1,7 +1,9 @@
 package bitcomm.sqlbuilder.operations;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -218,12 +220,20 @@ public class Where  implements WhereExpression {
 	return selectQuery;
     }
     public SelectQuery between(Object start , Object end){
-	if (end !=null && start!=null) {
+	
+	if (end !=null && start!=null 
+		&&((start instanceof CharSequence && end instanceof CharSequence) || (start instanceof Date && end instanceof Date))) 
+	{
+	    where(rightOperand,null, "BETWEEN '"+ start+"' AND '"+end+"'");
+	}
+	else if (end !=null && start!=null)
+	{
 	    where(rightOperand,null, "BETWEEN "+ start+" AND "+end);
 	}
 	else where(rightOperand, null, null);
 
 	return selectQuery;
+	
     }
 
     @Override
@@ -238,8 +248,8 @@ public class Where  implements WhereExpression {
 		
 		objNullCheck = object == null;
 		objInstanceTypeCheck = object instanceof Collection;
-		//objCollEmptCheck = ;
-		objListTypeCheck = (object instanceof List);
+//		objCollEmptCheck = ;
+//		objListTypeCheck = (object instanceof List);
 		objStringArrCheck = (object instanceof String[]);
 		
 //		System.out.println("SelectQuery :: object               :: "+ object);
@@ -254,7 +264,7 @@ public class Where  implements WhereExpression {
 		if (objNullCheck || (objInstanceTypeCheck && ((Collection) object).isEmpty())) 
 		    where(rightOperand, null, null);
 
-		else if(objListTypeCheck)
+		else if(objInstanceTypeCheck)
 		    where(rightOperand,null," IN ("+listToCommaArray((List)object)+")" );
 		
 		else if(objStringArrCheck)
