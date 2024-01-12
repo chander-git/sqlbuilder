@@ -20,4 +20,6 @@ public interface WhereExpression extends OrExpression , AndExpression ,OperatorE
     
     void setWhereRightOperand(Object rightOperand);
 
+    WhereExpression where(WhereExpression whereExpression);
+
 }

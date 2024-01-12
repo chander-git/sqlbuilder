@@ -94,7 +94,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	where.or();
 	return where;
     }
-
+    public WhereExpression where(WhereExpression whereExpression) 
+    {
+	where.where(whereExpression);
+	return where;
+    }
+    
     @Override
     public  WhereExpression and() {
 	where.and();
@@ -147,8 +152,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 
 	joinsString=join.build().orElse(EMPTY);
-
-	whereString=where.build().orElse(EMPTY);
+	
+	Optional<String> wBuild = where.build();
+	if (wBuild.isPresent() && !wBuild.get().isEmpty()) 
+	{
+	    whereString=" WHERE " +wBuild.get();
+	}else whereString=EMPTY;
 
 	String j = String.join(",", groupBy);
 	if (j != null && !j.isEmpty()) {

@@ -1,6 +1,5 @@
 package bitcomm.sqlbuilder.operations;
 
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -8,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import bitcomm.sqlbuilder.operations.apis.DataType;
@@ -25,8 +23,8 @@ public class Where  implements WhereExpression {
     private DataType rightOperandDataType=null;
     private final static String AND="AND";
     private final static String OR="OR";
-    
-    
+
+
     public Where(SelectQuery selectQuery ) {
 	this.selectQuery=selectQuery;
     }
@@ -49,7 +47,7 @@ public class Where  implements WhereExpression {
     public WhereExpression where(String column, String operator, Object value ) 
     {
 	try {
-	    
+
 	    if (value==null) 
 	    {
 		removeLastWhereOperator();
@@ -57,7 +55,7 @@ public class Where  implements WhereExpression {
 	    else
 	    {
 		appendDefaultLogicalOper();
-		
+
 		if (operator!=null)
 		{
 		    if (value instanceof Number|| value instanceof Boolean) {
@@ -77,7 +75,16 @@ public class Where  implements WhereExpression {
 		}
 		else {
 		    // LIKE oR ILIKE etc
-		    queryList.add(" "+column+ " "+ value.toString());
+		    if (value instanceof WhereExpression) 
+		    {
+			Optional<String> wQuery = ((WhereExpression)value).build();
+			if (wQuery.isPresent()) {
+			    queryList.add(" ( "+wQuery.get()+" )");
+			}
+
+		    }
+		    else
+			queryList.add(" "+column+ " "+ value.toString());
 		}
 	    }
 	} finally {
@@ -134,25 +141,17 @@ public class Where  implements WhereExpression {
     @Override
     public Optional<String> build() {
 
-	StringBuilder stringBuilder=new StringBuilder("");
-
 	if (queryList.isEmpty()==false)
 	{
-	    stringBuilder.append(" WHERE ");
-	    
+	    StringBuilder stringBuilder=new StringBuilder("");
 	    for (String list : queryList) 
 	    {
-		if (list.equals(OR) || list.equals(AND))
-		{
-		    stringBuilder.append(list);
-		}
-		else {
-		    stringBuilder.append(list);
-		}
+		stringBuilder.append(list);
 		stringBuilder.append(" ");
 	    }
+	    return Optional.of(stringBuilder.toString());
 	}
-	return Optional.of(stringBuilder.toString());
+	else return Optional.empty();
     }
 
     @Override
@@ -196,7 +195,7 @@ public class Where  implements WhereExpression {
 
 	return selectQuery;
     }
-    
+
     public SelectQuery lessThan(Object object){
 	where(rightOperand, "<", object);
 	return selectQuery;
@@ -220,7 +219,7 @@ public class Where  implements WhereExpression {
 	return selectQuery;
     }
     public SelectQuery between(Object start , Object end){
-	
+
 	if (end !=null && start!=null 
 		&&((start instanceof CharSequence && end instanceof CharSequence) || (start instanceof Date && end instanceof Date))) 
 	{
@@ -233,51 +232,51 @@ public class Where  implements WhereExpression {
 	else where(rightOperand, null, null);
 
 	return selectQuery;
-	
+
     }
 
     @Override
     public SelectQuery in(Object object) {
-	
+
 	try {
-		boolean objNullCheck;
-		boolean objInstanceTypeCheck;
-		boolean objCollEmptCheck;
-		boolean objListTypeCheck;
-		boolean objStringArrCheck;	
-		
-		objNullCheck = object == null;
-		objInstanceTypeCheck = object instanceof Collection;
-//		objCollEmptCheck = ;
-//		objListTypeCheck = (object instanceof List);
-		objStringArrCheck = (object instanceof String[]);
-		
-//		System.out.println("SelectQuery :: object               :: "+ object);
-//		
-//		System.out.println("SelectQuery :: objNullCheck         :: "+ objNullCheck);
-//		System.out.println("SelectQuery :: objInstanceTypeCheck :: "+ objInstanceTypeCheck);
-//		//System.out.println("SelectQuery :: objCollEmptCheck     :: "+ objCollEmptCheck);
-//		System.out.println("SelectQuery :: objListTypeCheck     :: "+ objListTypeCheck);
-		
-		//if (object == null || (object instanceof Collection && ((Collection) object).isEmpty())) 
-		
-		if (objNullCheck || (objInstanceTypeCheck && ((Collection) object).isEmpty())) 
-		    where(rightOperand, null, null);
+	    boolean objNullCheck;
+	    boolean objInstanceTypeCheck;
+	    boolean objCollEmptCheck;
+	    boolean objListTypeCheck;
+	    boolean objStringArrCheck;	
 
-		else if(objInstanceTypeCheck)
-		    where(rightOperand,null," IN ("+listToCommaArray((List)object)+")" );
-		
-		else if(objStringArrCheck)
-		    where(rightOperand,null," IN ("+listToCommaArray(Arrays.asList(object))+")" );
-		
-		else if(object instanceof SelectQuery) {
-		    SelectQuery  selectQ=(SelectQuery) object;
-		    where(rightOperand,null," IN ("+selectQ.toString()+")" );
+	    objNullCheck = object == null;
+	    objInstanceTypeCheck = object instanceof Collection;
+	    //		objCollEmptCheck = ;
+	    //		objListTypeCheck = (object instanceof List);
+	    objStringArrCheck = (object instanceof String[]);
 
-		}
+	    //		System.out.println("SelectQuery :: object               :: "+ object);
+	    //		
+	    //		System.out.println("SelectQuery :: objNullCheck         :: "+ objNullCheck);
+	    //		System.out.println("SelectQuery :: objInstanceTypeCheck :: "+ objInstanceTypeCheck);
+	    //		//System.out.println("SelectQuery :: objCollEmptCheck     :: "+ objCollEmptCheck);
+	    //		System.out.println("SelectQuery :: objListTypeCheck     :: "+ objListTypeCheck);
 
-		return selectQuery;
-	    
+	    //if (object == null || (object instanceof Collection && ((Collection) object).isEmpty())) 
+
+	    if (objNullCheck || (objInstanceTypeCheck && ((Collection) object).isEmpty())) 
+		where(rightOperand, null, null);
+
+	    else if(objInstanceTypeCheck)
+		where(rightOperand,null," IN ("+listToCommaArray((List)object)+")" );
+
+	    else if(objStringArrCheck)
+		where(rightOperand,null," IN ("+listToCommaArray(Arrays.asList(object))+")" );
+
+	    else if(object instanceof SelectQuery) {
+		SelectQuery  selectQ=(SelectQuery) object;
+		where(rightOperand,null," IN ("+selectQ.toString()+")" );
+
+	    }
+
+	    return selectQuery;
+
 	}
 	catch (Exception e) {
 	    e.printStackTrace();
@@ -296,10 +295,15 @@ public class Where  implements WhereExpression {
 
     @Override
     public OperatorExpression whereRaw(String raw) {
-	 queryList.add(raw);
-	 return this;
+	queryList.add(raw);
+	return this;
     }
 
-   
+    @Override
+    public WhereExpression where(WhereExpression whereExpression) {
+	return this.where(null, null, whereExpression);
+    }
+
+
 
 }
