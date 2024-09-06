@@ -247,18 +247,8 @@ public class Where  implements WhereExpression {
 
 	    objNullCheck = object == null;
 	    objInstanceTypeCheck = object instanceof Collection;
-	    //		objCollEmptCheck = ;
-	    //		objListTypeCheck = (object instanceof List);
 	    objStringArrCheck = (object instanceof String[]);
 
-	    //		System.out.println("SelectQuery :: object               :: "+ object);
-	    //		
-	    //		System.out.println("SelectQuery :: objNullCheck         :: "+ objNullCheck);
-	    //		System.out.println("SelectQuery :: objInstanceTypeCheck :: "+ objInstanceTypeCheck);
-	    //		//System.out.println("SelectQuery :: objCollEmptCheck     :: "+ objCollEmptCheck);
-	    //		System.out.println("SelectQuery :: objListTypeCheck     :: "+ objListTypeCheck);
-
-	    //if (object == null || (object instanceof Collection && ((Collection) object).isEmpty())) 
 
 	    if (objNullCheck || (objInstanceTypeCheck && ((Collection) object).isEmpty())) 
 		where(rightOperand, null, null);

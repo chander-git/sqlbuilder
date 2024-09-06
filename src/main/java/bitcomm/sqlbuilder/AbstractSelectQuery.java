@@ -58,7 +58,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     //////////////////////////////////////////////////////////
     private  WhereExpression where;
-    
+
     private JoinExpression join;
 
     private String joinsString = EMPTY;
@@ -83,7 +83,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     private boolean isBuildSuccess=false;
 
-    
+
     public AbstractSelectQuery() {
 	this.where = new Where(this);
 	this.join = new Join(this);
@@ -99,7 +99,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	where.where(whereExpression);
 	return where;
     }
-    
+
     @Override
     public  WhereExpression and() {
 	where.and();
@@ -123,11 +123,10 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	return where.whereNotNull(columns);
 
     }
-    
+
     @Override
     public OperatorExpression whereRaw(String raw) {
-        // TODO Auto-generated method stub
-        return where.whereRaw(raw);
+	return where.whereRaw(raw);
     }
 
     @Override
@@ -152,14 +151,16 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 
 	joinsString=join.build().orElse(EMPTY);
-	
+
 	Optional<String> wBuild = where.build();
 	if (wBuild.isPresent() && !wBuild.get().isEmpty()) 
 	{
 	    whereString=" WHERE " +wBuild.get();
-	}else whereString=EMPTY;
+	}
+	else whereString=EMPTY;
 
 	String j = String.join(",", groupBy);
+
 	if (j != null && !j.isEmpty()) {
 	    groupByString = "GROUP BY " + j;
 	}
@@ -176,7 +177,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	offsetString=OFFSET==null?EMPTY:("OFFSET "+OFFSET);
 
 	tableNameString = String.join(",", _tablename);
-	
+
 	String sqlQuery = String.format(
 
 		getResultSqlFormat(),
@@ -188,7 +189,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 		orderByString, limitString,  offsetString
 
 		)+unionString;
-	
+
 	Optional<String> buildEntity = Optional.of(sqlQuery);
 
 	isBuildSuccess=true;
@@ -197,10 +198,10 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
     public synchronized String countQuery(String countOf) 
     {
-//	if (!isBuildSuccess) 
-//	{
-//	    build();
-//	}
+	//	if (!isBuildSuccess) 
+	//	{
+	//	    build();
+	//	}
 	String j = String.join(",", groupBy);
 	if (j != null && !j.isEmpty()) {
 	    groupByString = "GROUP BY " + j;
@@ -251,7 +252,7 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	    searchFieldList.add(field);
 	}
 	searchField=String.join(",", searchFieldList);
-	
+
 	return this;
     }
     public SelectQuery selectDistinct(String... columns) {
@@ -263,14 +264,14 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	searchField="DISTINCT " +String.join(",", searchFieldList);
 	return this;
     }
-    
+
     @Override
     public SelectQuery from(SelectQuery selectQuery , String alias) {
-	
+
 	_tablename.add("("+selectQuery.toString()+") "+alias);
 	return this;
     }
-    
+
     @Override
     public SelectQuery orderBy(String column) {
 
@@ -279,6 +280,15 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	return this;
     }
 
+    @Override
+    public SelectQuery orderBy(String column,String order) {
+
+	if (order!=null) {
+	    String orderBy = (" "+column+" "+order );
+	    orderByList.add(orderBy);
+	}
+	return this;
+    }
     @Override
     public SelectQuery orderByDesc(String column) 
     {	
@@ -307,12 +317,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	this._tablename.add(tableName);
 	return this;
     }
-    
+
     @Override
     public SelectQuery from(String[] tableNames )
     {
 	for (String table : tableNames) {
-	    this._tablename.add(table);
+	    this.from(table);
 	}
 	return this;
     }
@@ -413,6 +423,12 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 
 	return this;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+         where.equalTo(obj);
+         return true;
+    }
 
     public SelectQuery between(Object start , Object end){
 	where.between(start, end);
@@ -430,11 +446,11 @@ public abstract class AbstractSelectQuery  implements SelectQuery
 	this.OFFSET=getOffset(pageSize, page);
 	return this;
     }
-    
+
     @Override
     public SelectQuery union(SelectQuery query) {
 	unionString=" "+query.toString();
-        return null;
+	return null;
     }
 
 }

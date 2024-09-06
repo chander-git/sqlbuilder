@@ -25,5 +25,7 @@ public interface SelectQuery extends InExpression,WhereExpression,JoinExpression
     
     SelectQuery union(SelectQuery query);
 
+    SelectQuery orderBy(String column, String orderBy);
+
     
 }

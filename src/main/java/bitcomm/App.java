@@ -1,133 +1,197 @@
 
 package bitcomm;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+class Message {
+    private String msg;
 
-import bitcomm.sqlbuilder.operations.InvalidSqlException;
-import bitcomm.sqlbuilder.operations.apis.SelectQuery;
-import bitcomm.sqlbuilder.psql.PsqlSelectQuery;
+    public Message(String str){
+	this.msg=str;
+    }
 
+    public String getMsg() {
+	return msg;
+    }
+
+    public void setMsg(String str) {
+	this.msg=str;
+    }
+
+}
+
+interface FunctionalInterfaceName
+{
+    public abstract void test();
+    
+    public boolean equals(Object object);
+    
+    public  int hashCode();
+    
+    
+    
+}
+
+class Waiter implements Runnable {
+
+    private Message msg;
+
+    public Waiter(Message m){
+	this.msg=m;
+
+    }
+
+    @Override
+    public void run() {
+	String name = Thread.currentThread().getName();
+	synchronized (msg) {
+	    try{
+		System.out.println(name+" waiting to get notified at time:"+System.currentTimeMillis());
+		msg.wait();
+	    }catch(InterruptedException e){
+		e.printStackTrace();
+	    }
+	    System.out.println(name+" waiter thread got notified at time:"+System.currentTimeMillis());
+	    //process the message now
+	    System.out.println(name+" processed: "+msg.getMsg());
+	}
+    }
+
+
+}
+
+class Notifier implements Runnable {
+
+    private Message msg;
+
+    public Notifier(Message msg) {
+	this.msg = msg;
+    }
+
+    @Override
+    public void run() {
+	String name = Thread.currentThread().getName();
+	System.out.println(name+" started");
+	try {
+	    Thread.sleep(1000);
+	    synchronized (msg) {
+		msg.setMsg(name+" Notifier work done");
+		msg.notify();
+		//		 msg.notifyAll();
+	    }
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
+
+    }
+
+}
+class Producer extends Thread
+{   
+    private Object mutex;
+
+    List<String> data;
+    public Producer(List<String> data,Object mutex) {
+	this. data=data;
+	this.mutex=mutex;
+    }
+    @Override
+    public void run() 
+    {
+	while (true) 
+	{
+	    try {
+		Thread.sleep(1000);
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+    }
+
+    public void add(String val)
+    {
+	synchronized (mutex) 
+	{
+	    data.add(val);
+	}
+	try {
+	    mutex.notify();
+	} catch (Exception e) {
+	}
+    }
+}
+
+class Consumer extends Thread
+{
+    private Object mutex;
+
+    Producer data;
+    public Consumer(Producer data,Object mutex)
+    {
+	this. data=data;
+	this.mutex=mutex;
+    }
+    @Override
+    public void run() 
+    {
+
+	while (true)
+	{
+	    try {
+		synchronized (mutex)
+		{
+		    mutex.wait();
+		}
+		for (String string : data.data) 
+		{
+		    System.out.println(string);
+		}
+		Thread.sleep(1000);
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+    }
+}
 
 
 public class App
 {
-    private static  Logger log = LogManager.getLogger();
- 
-    
-    public static String version="3.3.5";
-    private App(String page) {
-	
-	System.out.println("App constructor page : "+page);
-    }
-    public static void main(String[] args) 
+
+    public static void main(String[] args)
     {
-	log.info("Sql Builder App runuing..");
+	Object mutext=new Object();
 
-	
-//	historyFilter(UUID.fromString("a1430aa7-9830-4a2d-a556-88ab54d64571"), 1690548894000L, null, null, version, null, null);
-    }
-    
-    private static void func(StringBuilder charSequence) {
-	
-	try {
-	  Class<App> clazz=   (Class<App>) Class.forName("bitcomm.App");
-	  
-	  try {
-	      
-	      try {
-		  Class<?>[] empty = {"".getClass()};
-		Constructor<App> cons = clazz.getConstructor(empty);
-		try {
-		  App obj =(App) cons.newInstance("s");
-		  obj.historyFilter(null, null, null, null, version, null, null);
-		  
-		} catch (IllegalArgumentException | InvocationTargetException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		}
-	    } catch (NoSuchMethodException | SecurityException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
-//	      App app = (App)clazz.newInstance();
-	      
-//	      app.historyFilter(null, null, null, null, version, null, null);
-	      
-	      
-	      
-	} catch (InstantiationException | IllegalAccessException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-	} catch (ClassNotFoundException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-	
-	
-    }
-    public static void  historyFilter(UUID deviceId, Long startTS, Long endTs, List<String> keys,
-	    String dataSubType, Integer page, Integer pageSize){
+	String[] integers= {"1","2","3","4","5","6","7","8","9","10"};
+	List<String> list=new ArrayList<String>();
+	Producer printerA=new Producer(list,mutext);
+	Consumer printerB=new Consumer(printerA,mutext);
+
+	printerB.start();
 
 
-	SelectQuery selectQuery=new PsqlSelectQuery();
-
-	
-	try {
-	    selectQuery.select("d.name")
-	    .from("device d")
-	    .innerJoin("device_type dt")
-	    .on("d.typeId", "dt.typeid")
-	    .innerJoin("customer c")
-	    .on("d.customer_id", "c.customerid")
-	    .where("d.deviceId").equalTo(deviceId)
-
-	    .where("d.name")
-	    .like("NOQ")
-	    //	.or()
-	    //	.where("c.stncode").equalTo("MSV")
-
-	    .where("d.updated_ts")
-	    .between(null, null)
-	    .limit(10)
-	    .offset(20L)
-	    .where("d.name").like(null)
-
-	    .where("d.additionaldetail #>> '{remarks}'")
-	    .equalTo("None")
-	    .groupBy("d.updated_ts")
-	    .where("d.name")
-	    .ilike("APDJ".toLowerCase())
-	    .or()
-	    .where("  d.deviceid").equalTo(
-		    new PsqlSelectQuery().selectDistinct("d2.deviceid")
-		    .from("device d2").where("d2.deviceid").equalTo("a1430aa7-9830-4a2d-a556-88ab54d64571")
-		    )  
-
-	    .orderByDesc("d.updated_ts")
-	    .groupBy("d.name")
-	    .setPageRange(40, 0);
-	} catch (InvalidSqlException e) {
-	    e.printStackTrace();
+	for (String val : integers)
+	{	
+	    printerA.add(val);
 	}
 
-
-
-	String sqlString = selectQuery.toString();
-
-	String long1= selectQuery.countQuery();
-
-	System.out.println(long1);
-
-	System.out.println(sqlString);
-
+	//	Message msg = new Message("process it");
+	//	Waiter waiter1 = new Waiter(msg);
+	//	new Thread(waiter1, "waiter1").start();
+	//
+	//	
+	//	Waiter waiter = new Waiter(msg);
+	//	new Thread(waiter,"waiter").start();
+	//
+	//
+	//	Notifier notifier = new Notifier(msg);
+	//	new Thread(notifier, "notifier").start();
+	//	System.out.println("All the threads are started");
     }
 }
