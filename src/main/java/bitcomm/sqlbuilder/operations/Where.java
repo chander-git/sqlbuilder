@@ -111,14 +111,14 @@ public class Where  implements WhereExpression {
     @Override
     public WhereExpression whereNotNull(Object columns) 
     {
-	this.where(columns.toString(), null, "NOT NULL");
+	this.where(columns.toString(), null, "IS NOT NULL");
 	return  this;
     }
 
     @Override
     public WhereExpression whereIsNull(Object columns) {
 
-	this.where(columns.toString(), null, "IS NOT NULL");
+	this.where(columns.toString(), null, "IS NULL");
 	return  this;
 
     }
